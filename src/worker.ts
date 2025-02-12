@@ -1,10 +1,3 @@
-// env.d.ts
-interface Env {
-  BOT_TOKEN: string
-  RAPIDAPI_KEY: string
-  INSTAGRAM_STATS: KVNamespace
-}
-
 // worker.ts
 addEventListener('fetch', (event: FetchEvent) => {
   event.respondWith(handleRequest(event.request, event.env))
@@ -22,11 +15,11 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
   try {
     await validateRequest(request, env)
     
-    if (request.method === 'POST' && new RegExp(`^/webhook/${env.BOT_TOKEN}$`).test(url.pathname)) {
+    if (request.method === 'POST' && new RegExp(^/webhook/${env.BOT_TOKEN}$).test(url.pathname)) {
       return handleTelegramUpdate(await request.json(), env)
     }
     
-    return new Response('? ÓÑæíÓ ÝÚÇá', {
+    return new Response('✅ سرویس فعال', {
       status: 200,
       headers: {'Access-Control-Allow-Origin': '*'}
     })
@@ -62,7 +55,7 @@ async function handleTelegramUpdate(update: any, env: Env): Promise<Response> {
   return new Response('OK')
 }
 
-// ------ ÊæÇÈÚ ÇÕáí ------
+// ------ توابع اصلی ------
 async function validateRequest(request: Request, env: Env): Promise<void> {
   const signature = request.headers.get('X-Telegram-Bot-Api-Secret-Token')
   const secret = await env.INSTAGRAM_STATS.get('SECRET_HASH')
@@ -75,12 +68,12 @@ async function validateRequest(request: Request, env: Env): Promise<void> {
 async function sendWelcomeMenu(chatId: number, env: Env): Promise<void> {
   await telegramApi('sendMessage', {
     chat_id: chatId,
-    text: '?? *ÏÓÊÑÓí ÓÑíÚ:*',
+    text: '🛠 *دسترسی سریع:*',
     parse_mode: 'Markdown',
     reply_markup: {
       keyboard: [
-        [{text: '?? ÏÇäáæÏ ãÍÊæÇ'}, {text: '?? ÂãÇÑ ÑæÝÇíá'}],
-        [{text: '?? ÊäÙíãÇÊ'}, {text: '?? ÔÊíÈÇäí'}]
+        [{text: '📥 دانلود محتوا'}, {text: '📊 آمار پروفایل'}],
+        [{text: '⚙️ تنظیمات'}, {text: '📞 پشتیبانی'}]
       ],
       resize_keyboard: true
     }
@@ -89,7 +82,7 @@ async function sendWelcomeMenu(chatId: number, env: Env): Promise<void> {
 
 async function handleProfileCommand(chatId: number, text: string, env: Env): Promise<void> {
   const username = text.split(' ')[1]?.replace(/@/g, '')
-  if (!username) throw new Error('áØÝÇ äÇã ˜ÇÑÈÑí ÑÇ æÇÑÏ ˜äíÏ\nãËÇá: /profile username')
+  if (!username) throw new Error('لطفا نام کاربری را وارد کنید\nمثال: /profile username')
   
   const profile = await fetchProfileData(username, env)
   
@@ -100,19 +93,19 @@ async function handleProfileCommand(chatId: number, text: string, env: Env): Pro
     reply_markup: {
       inline_keyboard: [
         [
-          {text: '?? äãæÏÇÑ ÑÔÏ', callback_data: chart_${username}},
-          {text: '?? ÈÑæÒÑÓÇäí', callback_data: refresh_${username}}
+          {text: '📈 نمودار رشد', callback_data: chart_${username}},
+          {text: '🔄 بروزرسانی', callback_data: refresh_${username}}
         ],
         [
-          {text: '?? ÊäÙíã åÔÏÇÑ', callback_data: alert_${username}},
-          {text: '??? ãÔÇåÏå ÑæÝÇíá', url: https://instagram.com/${username}}
+          {text: '🔔 تنظیم هشدار', callback_data: alert_${username}},
+          {text: '👁️ مشاهده پروفایل', url: https://instagram.com/${username}}
         ]
       ]
     }
   }, env)
 }
 
-// ------ ÊæÇÈÚ API ------
+// ------ توابع API ------
 async function fetchProfileData(username: string, env: Env): Promise<any> {
   const cacheKey = profile_${username}
   const cached = await env.INSTAGRAM_STATS.get(cacheKey, 'json')
@@ -126,18 +119,20 @@ async function fetchProfileData(username: string, env: Env): Promise<any> {
     }
   })
   
-  if (!response.ok) throw new Error('ÎØÇ ÏÑ ÏÑíÇÝÊ ÇØáÇÚÇÊ ÑæÝÇíá')
+  if (!response.ok) throw new Error('خطا در دریافت اطلاعات پروفایل')
   
   const data = await response.json()
   await env.INSTAGRAM_STATS.put(cacheKey, JSON.stringify(data), {expirationTtl: 3600})
   
   return data
 }
+
+> ᴛᴀʏᴍᴀᴢ:
 async function handleInstagramMedia(chatId: number, url: string, env: Env): Promise<void> {
   try {
     const parsedUrl = new URL(url)
     if (!['instagram.com', 'www.instagram.com'].includes(parsedUrl.hostname)) {
-      throw new Error('áíä˜ ÇíäÓÊÇÑÇã ãÚÊÈÑ äíÓÊ')
+      throw new Error('لینک اینستاگرام معتبر نیست')
     }
 
     const response = await fetch(${INSTA_API}/media?url=${encodeURIComponent(url)}, {
@@ -147,7 +142,7 @@ async function handleInstagramMedia(chatId: number, url: string, env: Env): Prom
       }
     })
     
-    if (!response.ok) throw new Error('ÎØÇ ÏÑ ÏÑíÇÝÊ ãÍÊæÇ')
+    if (!response.ok) throw new Error('خطا در دریافت محتوا')
     
     const media = await response.json()
 
@@ -156,7 +151,7 @@ async function handleInstagramMedia(chatId: number, url: string, env: Env): Prom
         chat_id: chatId,
         video: media.url,
         supports_streaming: true,
-        caption: '?? æíÏíæ ÏÑíÇÝÊ ÔÏ'
+        caption: '🎥 ویدیو دریافت شد'
       }, env)
     } else {
       await sendPhotoAlbum(chatId, media.images, env)
@@ -166,22 +161,22 @@ async function handleInstagramMedia(chatId: number, url: string, env: Env): Prom
   }
 }
 
-// ------ ÊæÇÈÚ ˜ã˜í ------
+// ------ توابع کمکی ------
 function formatProfileText(profile: any): string {
-  return ?? *ÂãÇÑ ÑæÝÇíá*\n
-?? äÇã: ${profile.full_name}
-?? äÇã ˜ÇÑÈÑí: @${profile.username}
-?? ÏäÈÇá ˜ääÏå: ${Number(profile.followers).toLocaleString('fa-IR')}
-?? ÏäÈÇá ãí˜äÏ: ${Number(profile.following).toLocaleString('fa-IR')}
-?? ÓÊåÇ: ${Number(profile.post_count).toLocaleString('fa-IR')}
-?? åÇíáÇíÊåÇ: ${profile.highlight_reel_count}
+  return 📊 *آمار پروفایل*\n
+👤 نام: ${profile.full_name}
+📌 نام کاربری: @${profile.username}
+👥 دنبال کننده: ${Number(profile.followers).toLocaleString('fa-IR')}
+📌 دنبال میکند: ${Number(profile.following).toLocaleString('fa-IR')}
+📮 پستها: ${Number(profile.post_count).toLocaleString('fa-IR')}
+🖼 هایلایت‌ها: ${profile.highlight_reel_count}
 }
 
 async function sendPhotoAlbum(chatId: number, images: string[], env: Env): Promise<void> {
   const media = images.map((url, index) => ({
     type: 'photo',
     media: url,
-    caption: index === 0 ? '?? ãÌãæÚå ÊÕÇæíÑ:' : ''
+    caption: index === 0 ? '📸 مجموعه تصاویر:' : ''
   }))
 
   await telegramApi('sendMediaGroup', {
@@ -198,11 +193,11 @@ async function telegramApi(method: string, params: object, env: Env): Promise<an
   })
   
   const data = await response.json()
-  if (!data.ok) throw new Error(data.description || 'ÎØÇ ÏÑ ÇÑÊÈÇØ ÈÇ ÊáÑÇã')
+  if (!data.ok) throw new Error(data.description || 'خطا در ارتباط با تلگرام')
   return data
 }
 
-// ------ ÓíÓÊã áÇ æ ãÏíÑíÊ ÎØÇåÇ ------
+// ------ سیستم لاگ و مدیریت خطاها ------
 async function logInteraction(chatId: number, text: string, env: Env): Promise<void> {
   const timestamp = new Date().toISOString()
   await env.INSTAGRAM_STATS.put(
@@ -211,49 +206,4 @@ async function logInteraction(chatId: number, text: string, env: Env): Promise<v
   )
 }
 
-async function sendError(chatId: number, error: string, env: Env): Promise<void> {
-  await telegramApi('sendMessage', {
-    chat_id: chatId,
-    text: ?? ÎØÇ:\n${error}
-  }, env)
-}
-
-// ------ ÊæÇÈÚ ÒãÇäÈäÏí ÔÏå ------
-async function handleScheduledEvent(env: Env): Promise<void> {
-  await cleanOldCache(env)
-  await checkFollowerAlerts(env)
-}
-
-async function cleanOldCache(env: Env): Promise<void> {
-  const keys = await env.INSTAGRAM_STATS.list({prefix: 'profile_'})
-  for (const key of keys.keys) {
-    await env.INSTAGRAM_STATS.delete(key.name)
-  }
-}
-
-async function checkFollowerAlerts(env: Env): Promise<void> {
-  // íÇÏåÓÇÒí ãäØÞ åÔÏÇÑåÇ
-}
-
-// ------ ÊæÇÈÚ ÇÖÇÝí ------
-async function handleInlineButton(chatId: number, data: string, env: Env): Promise<void> {
-  const [action, username] = data.split('_')
-  switch(action) {
-    case 'chart':
-      await sendGrowthChart(chatId, username, env)
-      break
-    case 'refresh':
-      await refreshProfileData(chatId, username, env)
-      break
-    case 'alert':
-      await setupFollowerAlert(chatId, username, env)
-      break
-  }
-}
-
-async function handleUnknownCommand(chatId: number, env: Env): Promise<void> {
-  await telegramApi('sendMessage', {
-    chat_id: chatId,
-    text: '?? ÏÓÊæÑ äÇÔäÇÎÊå!'
-  }, env)
-}
+async

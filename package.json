@@ -1,0 +1,6 @@
+{
+       "name": "telegram-bot",
+       "devDependencies": {
+         "@cloudflare/workers-types": "^4.0.0"
+       }
+     }

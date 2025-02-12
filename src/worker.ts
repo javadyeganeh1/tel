@@ -22,11 +22,11 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
   try {
     await validateRequest(request, env)
     
-    if (request.method === 'POST' && new RegExp(^/webhook/${env.BOT_TOKEN}$).test(url.pathname)) {
+    if (request.method === 'POST' && new RegExp(`^/webhook/${env.BOT_TOKEN}$`).test(url.pathname)) {
       return handleTelegramUpdate(await request.json(), env)
     }
     
-    return new Response('? ”—ÊÌ” ›⁄«·', {
+    return new Response('? √ì√ë√¶√≠√ì √ù√ö√á√°', {
       status: 200,
       headers: {'Access-Control-Allow-Origin': '*'}
     })
@@ -62,7 +62,7 @@ async function handleTelegramUpdate(update: any, env: Env): Promise<Response> {
   return new Response('OK')
 }
 
-// ------  Ê«»⁄ «’·Ì ------
+// ------ √ä√¶√á√à√ö √á√ï√°√≠ ------
 async function validateRequest(request: Request, env: Env): Promise<void> {
   const signature = request.headers.get('X-Telegram-Bot-Api-Secret-Token')
   const secret = await env.INSTAGRAM_STATS.get('SECRET_HASH')
@@ -75,12 +75,12 @@ async function validateRequest(request: Request, env: Env): Promise<void> {
 async function sendWelcomeMenu(chatId: number, env: Env): Promise<void> {
   await telegramApi('sendMessage', {
     chat_id: chatId,
-    text: '?? *œ” —”Ì ”—Ì⁄:*',
+    text: '?? *√è√ì√ä√ë√ì√≠ √ì√ë√≠√ö:*',
     parse_mode: 'Markdown',
     reply_markup: {
       keyboard: [
-        [{text: '?? œ«‰·Êœ „Õ Ê«'}, {text: '?? ¬„«— Å—Ê›«Ì·'}],
-        [{text: '??  ‰ŸÌ„« '}, {text: '?? Å‘ Ì»«‰Ì'}]
+        [{text: '?? √è√á√§√°√¶√è √£√ç√ä√¶√á'}, {text: '?? √Ç√£√á√ë ¬Å√ë√¶√ù√á√≠√°'}],
+        [{text: '?? √ä√§√ô√≠√£√á√ä'}, {text: '?? ¬Å√î√ä√≠√à√á√§√≠'}]
       ],
       resize_keyboard: true
     }
@@ -89,7 +89,7 @@ async function sendWelcomeMenu(chatId: number, env: Env): Promise<void> {
 
 async function handleProfileCommand(chatId: number, text: string, env: Env): Promise<void> {
   const username = text.split(' ')[1]?.replace(/@/g, '')
-  if (!username) throw new Error('·ÿ›« ‰«„ ò«—»—Ì —« Ê«—œ ò‰Ìœ\n„À«·: /profile username')
+  if (!username) throw new Error('√°√ò√ù√á √§√á√£ Àú√á√ë√à√ë√≠ √ë√á √¶√á√ë√è Àú√§√≠√è\n√£√ã√á√°: /profile username')
   
   const profile = await fetchProfileData(username, env)
   
@@ -100,19 +100,19 @@ async function handleProfileCommand(chatId: number, text: string, env: Env): Pro
     reply_markup: {
       inline_keyboard: [
         [
-          {text: '?? ‰„Êœ«— —‘œ', callback_data: chart_${username}},
-          {text: '?? »—Ê“—”«‰Ì', callback_data: refresh_${username}}
+          {text: '?? √§√£√¶√è√á√ë √ë√î√è', callback_data: chart_${username}},
+          {text: '?? √à√ë√¶√í√ë√ì√á√§√≠', callback_data: refresh_${username}}
         ],
         [
-          {text: '??  ‰ŸÌ„ Â‘œ«—', callback_data: alert_${username}},
-          {text: '??? „‘«ÂœÂ Å—Ê›«Ì·', url: https://instagram.com/${username}}
+          {text: '?? √ä√§√ô√≠√£ √•√î√è√á√ë', callback_data: alert_${username}},
+          {text: '??? √£√î√á√•√è√• ¬Å√ë√¶√ù√á√≠√°', url: https://instagram.com/${username}}
         ]
       ]
     }
   }, env)
 }
 
-// ------  Ê«»⁄ API ------
+// ------ √ä√¶√á√à√ö API ------
 async function fetchProfileData(username: string, env: Env): Promise<any> {
   const cacheKey = profile_${username}
   const cached = await env.INSTAGRAM_STATS.get(cacheKey, 'json')
@@ -126,7 +126,7 @@ async function fetchProfileData(username: string, env: Env): Promise<any> {
     }
   })
   
-  if (!response.ok) throw new Error('Œÿ« œ— œ—Ì«›  «ÿ·«⁄«  Å—Ê›«Ì·')
+  if (!response.ok) throw new Error('√é√ò√á √è√ë √è√ë√≠√á√ù√ä √á√ò√°√á√ö√á√ä ¬Å√ë√¶√ù√á√≠√°')
   
   const data = await response.json()
   await env.INSTAGRAM_STATS.put(cacheKey, JSON.stringify(data), {expirationTtl: 3600})
@@ -137,7 +137,7 @@ async function handleInstagramMedia(chatId: number, url: string, env: Env): Prom
   try {
     const parsedUrl = new URL(url)
     if (!['instagram.com', 'www.instagram.com'].includes(parsedUrl.hostname)) {
-      throw new Error('·Ì‰ò «Ì‰” «ê—«„ „⁄ »— ‰Ì” ')
+      throw new Error('√°√≠√§Àú √á√≠√§√ì√ä√á¬ê√ë√á√£ √£√ö√ä√à√ë √§√≠√ì√ä')
     }
 
     const response = await fetch(${INSTA_API}/media?url=${encodeURIComponent(url)}, {
@@ -147,7 +147,7 @@ async function handleInstagramMedia(chatId: number, url: string, env: Env): Prom
       }
     })
     
-    if (!response.ok) throw new Error('Œÿ« œ— œ—Ì«›  „Õ Ê«')
+    if (!response.ok) throw new Error('√é√ò√á √è√ë √è√ë√≠√á√ù√ä √£√ç√ä√¶√á')
     
     const media = await response.json()
 
@@ -156,7 +156,7 @@ async function handleInstagramMedia(chatId: number, url: string, env: Env): Prom
         chat_id: chatId,
         video: media.url,
         supports_streaming: true,
-        caption: '?? ÊÌœÌÊ œ—Ì«›  ‘œ'
+        caption: '?? √¶√≠√è√≠√¶ √è√ë√≠√á√ù√ä √î√è'
       }, env)
     } else {
       await sendPhotoAlbum(chatId, media.images, env)
@@ -166,22 +166,22 @@ async function handleInstagramMedia(chatId: number, url: string, env: Env): Prom
   }
 }
 
-// ------  Ê«»⁄ ò„òÌ ------
+// ------ √ä√¶√á√à√ö Àú√£Àú√≠ ------
 function formatProfileText(profile: any): string {
-  return ?? *¬„«— Å—Ê›«Ì·*\n
-?? ‰«„: ${profile.full_name}
-?? ‰«„ ò«—»—Ì: @${profile.username}
-?? œ‰»«· ò‰‰œÂ: ${Number(profile.followers).toLocaleString('fa-IR')}
-?? œ‰»«· „Ìò‰œ: ${Number(profile.following).toLocaleString('fa-IR')}
-?? Å” Â«: ${Number(profile.post_count).toLocaleString('fa-IR')}
-?? Â«Ì·«Ì ùÂ«: ${profile.highlight_reel_count}
+  return ?? *√Ç√£√á√ë ¬Å√ë√¶√ù√á√≠√°*\n
+?? √§√á√£: ${profile.full_name}
+?? √§√á√£ Àú√á√ë√à√ë√≠: @${profile.username}
+?? √è√§√à√á√° Àú√§√§√è√•: ${Number(profile.followers).toLocaleString('fa-IR')}
+?? √è√§√à√á√° √£√≠Àú√§√è: ${Number(profile.following).toLocaleString('fa-IR')}
+?? ¬Å√ì√ä√•√á: ${Number(profile.post_count).toLocaleString('fa-IR')}
+?? √•√á√≠√°√á√≠√ä¬ù√•√á: ${profile.highlight_reel_count}
 }
 
 async function sendPhotoAlbum(chatId: number, images: string[], env: Env): Promise<void> {
   const media = images.map((url, index) => ({
     type: 'photo',
     media: url,
-    caption: index === 0 ? '?? „Ã„Ê⁄Â  ’«ÊÌ—:' : ''
+    caption: index === 0 ? '?? √£√å√£√¶√ö√• √ä√ï√á√¶√≠√ë:' : ''
   }))
 
   await telegramApi('sendMediaGroup', {
@@ -198,11 +198,11 @@ async function telegramApi(method: string, params: object, env: Env): Promise<an
   })
   
   const data = await response.json()
-  if (!data.ok) throw new Error(data.description || 'Œÿ« œ— «— »«ÿ »«  ·ê—«„')
+  if (!data.ok) throw new Error(data.description || '√é√ò√á √è√ë √á√ë√ä√à√á√ò √à√á √ä√°¬ê√ë√á√£')
   return data
 }
 
-// ------ ”Ì” „ ·«ê Ê „œÌ—Ì  Œÿ«Â« ------
+// ------ √ì√≠√ì√ä√£ √°√á¬ê √¶ √£√è√≠√ë√≠√ä √é√ò√á√•√á ------
 async function logInteraction(chatId: number, text: string, env: Env): Promise<void> {
   const timestamp = new Date().toISOString()
   await env.INSTAGRAM_STATS.put(
@@ -214,11 +214,11 @@ async function logInteraction(chatId: number, text: string, env: Env): Promise<v
 async function sendError(chatId: number, error: string, env: Env): Promise<void> {
   await telegramApi('sendMessage', {
     chat_id: chatId,
-    text: ?? Œÿ«:\n${error}
+    text: ?? √é√ò√á:\n${error}
   }, env)
 }
 
-// ------  Ê«»⁄ “„«‰»‰œÌ ‘œÂ ------
+// ------ √ä√¶√á√à√ö √í√£√á√§√à√§√è√≠ √î√è√• ------
 async function handleScheduledEvent(env: Env): Promise<void> {
   await cleanOldCache(env)
   await checkFollowerAlerts(env)
@@ -232,10 +232,10 @@ async function cleanOldCache(env: Env): Promise<void> {
 }
 
 async function checkFollowerAlerts(env: Env): Promise<void> {
-  // ÅÌ«œÂù”«“Ì „‰ÿﬁ Â‘œ«—Â«
+  // ¬Å√≠√á√è√•¬ù√ì√á√í√≠ √£√§√ò√û √•√î√è√á√ë√•√á
 }
 
-// ------  Ê«»⁄ «÷«›Ì ------
+// ------ √ä√¶√á√à√ö √á√ñ√á√ù√≠ ------
 async function handleInlineButton(chatId: number, data: string, env: Env): Promise<void> {
   const [action, username] = data.split('_')
   switch(action) {
@@ -254,6 +254,6 @@ async function handleInlineButton(chatId: number, data: string, env: Env): Promi
 async function handleUnknownCommand(chatId: number, env: Env): Promise<void> {
   await telegramApi('sendMessage', {
     chat_id: chatId,
-    text: '?? œ” Ê— ‰«‘‰«Œ Â!'
+    text: '?? √è√ì√ä√¶√ë √§√á√î√§√á√é√ä√•!'
   }, env)
 }
